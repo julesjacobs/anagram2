@@ -113,17 +113,17 @@ bool is_zero(hist h_){
     return true;
 }
 
-bool is_sub(hist h1_, hist h2_){
-    $ h1 = (char*)&h1_;
-    $ h2 = (char*)&h2_;
-    each(i,26) if(h1[i] > h2[i]) return false;
-    return true;
-}
-
 // bool is_sub(hist h1_, hist h2_){
-//     $ h = _mm256_cmpgt_epi8(h1_, h2_);
-//     return (_mm256_movemask_epi8(h) & 0) == 0;
+//     $ h1 = (char*)&h1_;
+//     $ h2 = (char*)&h2_;
+//     each(i,26) if(h1[i] > h2[i]) return false;
+//     return true;
 // }
+
+bool is_sub(hist h1, hist h2){
+    $ h = _mm256_cmpgt_epi8(h1, h2);
+    return (_mm256_movemask_epi8(h) & 0b11111111111111111111111111) == 0;
+}
 
 hist sub(hist h1_, hist h2_){
     $ h1 = (char*)&h1_;
@@ -134,26 +134,11 @@ hist sub(hist h1_, hist h2_){
     return out_;
 }
 
-bool has_letter(hist h_, char l){
-    $ h = (char*)&h_;
-    return h[l] > 0;
-}
-
-// select the next letter of target to branch on
-// if the selected letter is l, we will only try words that contain l
-char select_letter(hist target, hist* low, hist* high){
-    $ t = (char*)&target;
-    each(i,32) if(t[i] > 0) return i;
-    cout << "ERROR!! none of the things in target is positive! \n";
-    return -1;
-}
-
 bool allow_multiple_uses = 0;
 vector<string> words;
 
 void anagrams(vector<hist> sofar, hist target, hist* low, hist* high){
     if(is_zero(target)){
-        // cout << "Found anagram of length " << sofar.size() << ": ";
         for($ h : sofar) cout << words[hist_tag(h)] << " ";
         cout << "\n";
         return;
@@ -163,12 +148,13 @@ void anagrams(vector<hist> sofar, hist target, hist* low, hist* high){
     for($ h = low; h <= high;) if(!is_sub(*h, target)) swap(*h, *high--); else h++;
 
     // select a letter l to branch on
-    char l = select_letter(target, low, high);
-    // cout << "selected letter: " << (char)(l + 'a') << " " << hist_str(target) << "\n";
+    $ t = (char*)&target;
+    char l = 0;
+    each(i,26) if(t[i] > 0) l = i;
 
     // permute dict to put the words that have letter l at the front
     $ next = low;
-    for($ h = low; h <= high; h++) if(has_letter(*h, l)) swap(*h, *next++);
+    for($ h = low; h <= high; h++) if(((char*)h)[l] > 0) swap(*h, *next++);
 
     while(--next >= low){
         $ newsofar = sofar;

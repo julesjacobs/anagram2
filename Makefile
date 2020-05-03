@@ -10,7 +10,7 @@ bigtest: anagram
 	python3 test.py
 
 time: anagram
-	time ./anagram dict/pt-Br_dictionary.txt gabrielfarinas
+	time ./anagram dict/pt-Br_dictionary.txt gabrielfarinas > gabrielfarinas.txt
 
 clean:
 	rm anagram
