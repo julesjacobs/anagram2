@@ -116,7 +116,7 @@ bool is_zero(hist h_){
 bool is_sub(hist h1_, hist h2_){
     $ h1 = (char*)&h1_;
     $ h2 = (char*)&h2_;
-    each(i,27) if(h1[i] > h2[i]) return false;
+    each(i,26) if(h1[i] > h2[i]) return false;
     return true;
 }
 
