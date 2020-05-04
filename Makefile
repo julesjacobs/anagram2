@@ -1,5 +1,5 @@
-anagram: main.cpp
-	g++ main.cpp -o anagram -std=c++17
+anagram: main.cpp Makefile
+	g++ main.cpp -o anagram -std=c++17 -O3 -march=native
 
 test: anagram
 	./anagram dict/minimal.txt tommarvoloriddle
@@ -15,7 +15,6 @@ time: anagram
 
 bigtime: anagram
 	time ./anagram dict/us_dictionary.txt gabrielfarinas > gabrielfarinas_us.txt
-
 
 clean:
 	rm anagram

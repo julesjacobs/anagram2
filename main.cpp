@@ -19,25 +19,33 @@ hist str_hist(string s, string* word){
     return out;
 }
 
+// bool is_sub(hist h1, hist h2){
+//     bool out = true;
+//     each(i,26) out = out & (h1.hist[i] <= h2.hist[i]);
+//     return out;
+// }
+
+#include<immintrin.h>
 bool is_sub(hist h1, hist h2){
-    each(i,26) if(h1.hist[i] > h2.hist[i]) return false;
-    return true;
+    $ h = _mm256_cmpgt_epi8(*(__m256i*)&h1, *(__m256i*)&h2);
+    return (_mm256_movemask_epi8(h) & 0b11111111111111111111111111) == 0;
 }
 
 bool allow_multiple_uses = 1;
 
 void anagrams(string sofar, hist target, hist* low, hist* high){
+    // cout << "DEBUG: " << sofar << " (dict size " << high - low + 1 << ")\n";
     // select a letter l to branch on
     char l = 0;
     while(l < 26 && target.hist[l] == 0) l++;
     if(l == 26){ cout << sofar << "\n"; return; }
 
     // permute dict to put impossible words at the end, and decrement high to remove those from consideration
-    for($ h = low; h <= high;) if(!is_sub(*h, target)) swap(*h, *high--); else h++;
-
-    // permute dict to put the words that have letter l at the front, between low..next
+    // and put the words that have letter l at the front, between low..next
     $ next = low;
-    for($ h = low; h <= high; h++) if(h->hist[l] > 0) swap(*h, *next++);
+    for($ h = low; h <= high; h++)
+        if(!is_sub(*h, target)) swap(*h--, *high--);
+        else if(h->hist[l] > 0) swap(*h, *next++);
 
     // try all the words with letter l (those are now in low..next)
     // this is the main algorithmic optimisation compared to the original
