@@ -54,13 +54,15 @@ void anagrams(string sofar, hist target, hist* low, hist* high){
     // a further optimisation that we don't do here is to choose l intelligently
     // for example, by choosing l such that the number of words to try is minimized
     while(--next >= low){
-        $ newsofar = sofar; $ newtarget = target;
+        $ oldlen = sofar.size();
+        $ newtarget = target;
         while(is_sub(*next, newtarget)){
-            newsofar += *next->word + " ";
+            sofar += *next->word + " ";
             each(i,26) newtarget.hist[i] -= next->hist[i];
-            anagrams(newsofar, newtarget, next+1, high);
+            anagrams(sofar, newtarget, next+1, high);
             if(!allow_multiple_uses) break;
         }
+        sofar.resize(oldlen);
     }
 }
 
