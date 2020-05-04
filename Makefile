@@ -11,6 +11,11 @@ bigtest: anagram
 
 time: anagram
 	time ./anagram dict/pt-Br_dictionary.txt gabrielfarinas > gabrielfarinas.txt
+	time ./anagram dict/pt-Br_dictionary.txt gabrielwernersbachfarinas > gabrielwernersbachfarinas.txt
+
+bigtime: anagram
+	time ./anagram dict/us_dictionary.txt gabrielfarinas > gabrielfarinas_us.txt
+
 
 clean:
 	rm anagram

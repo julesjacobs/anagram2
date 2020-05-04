@@ -6,6 +6,8 @@ using namespace std;
 #define $ auto
 #define each(i,n) for(int i = 0; i < n; i++)
 
+// TODO: try different memory layout, where the wordlist in the algorithm is represented by an array of pointers instead of an array of hists
+// since hists are large, this may speed up the code
 typedef struct { char hist[26]; string* word; } hist;
 
 hist str_hist(string s, string* word){
@@ -21,7 +23,7 @@ bool is_sub(hist h1, hist h2){
     return true;
 }
 
-bool allow_multiple_uses = 0;
+bool allow_multiple_uses = 1;
 
 void anagrams(string sofar, hist target, hist* low, hist* high){
     // select a letter l to branch on
@@ -53,7 +55,10 @@ int main(int argc, char** argv){
     vector<string> words;
     ifstream dict(argv[1]);
     string line;
-    while(getline(dict, line)) words.push_back(line);
+    while(getline(dict, line)){
+        if(line.size()<=2) continue;
+        words.push_back(line);
+    }
     each(i, words.size()) hists.push_back(str_hist(words[i], &words[i]));
     hist target = str_hist(argv[2],0);
     anagrams("", target, &hists[0], &hists[hists.size()-1]);
