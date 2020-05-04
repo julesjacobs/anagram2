@@ -33,16 +33,13 @@ bool is_sub(hist h1, hist h2){
 
 bool allow_multiple_uses = 1;
 
-vector<string*> sofar;
-
-void anagrams(hist target, hist* low, hist* high){
+void anagrams(string sofar, hist target, hist* low, hist* high){
     // cout << "DEBUG: " << sofar << " (dict size " << high - low + 1 << ")\n";
     // select a letter l to branch on
     char l = 0;
     while(l < 26 && target.hist[l] == 0) l++;
     if(l == 26){
-        for($ s : sofar) cout << *s << " ";
-        cout << "\n"; return;
+        cout << sofar << "\n"; return;
     }
 
     // permute dict to put impossible words at the end, and decrement high to remove those from consideration
@@ -62,9 +59,9 @@ void anagrams(hist target, hist* low, hist* high){
         $ oldlen = sofar.size();
         $ newtarget = target;
         while(is_sub(*next, newtarget)){
-            sofar.push_back(next->word);
+            sofar += *next->word; sofar.push_back(' ');
             each(i,26) newtarget.hist[i] -= next->hist[i];
-            anagrams(newtarget, next+1, high);
+            anagrams(sofar, newtarget, next+1, high);
             if(!allow_multiple_uses) break;
         }
         sofar.resize(oldlen);
@@ -82,5 +79,5 @@ int main(int argc, char** argv){
     }
     each(i, words.size()) hists.push_back(str_hist(words[i], &words[i]));
     hist target = str_hist(argv[2],0);
-    anagrams(target, &hists[0], &hists[hists.size()-1]);
+    anagrams("", target, &hists[0], &hists[hists.size()-1]);
 }
