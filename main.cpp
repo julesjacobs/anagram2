@@ -39,7 +39,7 @@ void anagrams(string sofar, hist target, hist* low, hist* high){
     char l = 0;
     while(l < 26 && target.hist[l] == 0) l++;
     if(l == 26){
-        cout << sofar << "\n"; return;
+        sofar.push_back('\n'); cout << sofar; return;
     }
 
     // permute dict to put impossible words at the end, and decrement high to remove those from consideration
