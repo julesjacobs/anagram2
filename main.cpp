@@ -11,14 +11,9 @@ typedef struct { char hist[26]; string* word; } hist;
 hist str_hist(string s, string* word){
     hist out;
     each(i,26) out.hist[i] = 0;
-    for($ c : s) out.hist[c - 'a'] += 1;
+    for($ c : s) out.hist[c - 'a']++;
     out.word = word;
     return out;
-}
-
-bool is_zero(hist h){
-    each(i,26) if(h.hist[i] != 0) return false;
-    return true;
 }
 
 bool is_sub(hist h1, hist h2){
@@ -29,14 +24,13 @@ bool is_sub(hist h1, hist h2){
 bool allow_multiple_uses = 0;
 
 void anagrams(string sofar, hist target, hist* low, hist* high){
-    if(is_zero(target)){ cout << sofar << "\n"; return; }
+    // select a letter l to branch on
+    char l = 0;
+    while(l < 26 && target.hist[l] == 0) l++;
+    if(l == 26){ cout << sofar << "\n"; return; }
 
     // permute dict to put impossible words at the end, and decrement high to remove those from consideration
     for($ h = low; h <= high;) if(!is_sub(*h, target)) swap(*h, *high--); else h++;
-
-    // select a letter l to branch on
-    char l = 0;
-    while(target.hist[l] == 0) l++;
 
     // permute dict to put the words that have letter l at the front
     $ next = low;
@@ -44,8 +38,7 @@ void anagrams(string sofar, hist target, hist* low, hist* high){
 
     // try all the words from low..next
     while(--next >= low){
-        $ newsofar = sofar;
-        $ newtarget = target;
+        $ newsofar = sofar; $ newtarget = target;
         while(is_sub(*next, newtarget)){
             newsofar += *next->word + " ";
             each(i,26) newtarget.hist[i] -= next->hist[i];
@@ -63,6 +56,5 @@ int main(int argc, char** argv){
     while(getline(dict, line)) words.push_back(line);
     each(i, words.size()) hists.push_back(str_hist(words[i], &words[i]));
     hist target = str_hist(argv[2],0);
-    string sofar;
-    anagrams(sofar, target, &hists[0], &hists[hists.size()-1]);
+    anagrams("", target, &hists[0], &hists[hists.size()-1]);
 }
