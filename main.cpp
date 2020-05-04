@@ -7,7 +7,8 @@ using namespace std;
 #define each(i,n) for(int i = 0; i < n; i++)
 
 // TODO: try different memory layout, where the wordlist in the algorithm is represented by an array of pointers instead of an array of hists
-// since hists are large, this may speed up the code
+// Since hists are large, this may speed up the code, but since it reduces memory locality, it may make it slower.
+// if we do this, then we do probably want to pre-filter the word list with respect to target, for memory locality
 typedef struct { char hist[26]; string* word; } hist;
 
 hist str_hist(string s, string* word){
@@ -34,11 +35,16 @@ void anagrams(string sofar, hist target, hist* low, hist* high){
     // permute dict to put impossible words at the end, and decrement high to remove those from consideration
     for($ h = low; h <= high;) if(!is_sub(*h, target)) swap(*h, *high--); else h++;
 
-    // permute dict to put the words that have letter l at the front
+    // permute dict to put the words that have letter l at the front, between low..next
     $ next = low;
     for($ h = low; h <= high; h++) if(h->hist[l] > 0) swap(*h, *next++);
 
-    // try all the words from low..next
+    // try all the words with letter l (those are now in low..next)
+    // this is the main algorithmic optimisation compared to the original
+    // we only have to check words that contain l, instead of all words
+    // this can reduce the search space by a lot
+    // a further optimisation that we don't do here is to choose l intelligently
+    // for example, by choosing l such that the number of words to try is minimized
     while(--next >= low){
         $ newsofar = sofar; $ newtarget = target;
         while(is_sub(*next, newtarget)){
