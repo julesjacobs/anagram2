@@ -1,5 +1,5 @@
 anagram: main.cpp
-	g++ main.cpp -o anagram -std=c++17 -mavx2
+	g++ main.cpp -o anagram -std=c++17
 
 test: anagram
 	./anagram dict/minimal.txt tommarvoloriddle
